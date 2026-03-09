@@ -33,7 +33,12 @@ export const jobApplicationRepository = {
 
 	async findByUser(
 		userId: string,
-		opts?: { limit?: number; status?: JobApplicationStatus },
+		opts?: {
+			limit?: number;
+			status?: JobApplicationStatus;
+			fromDate?: Date;
+			toDate?: Date;
+		},
 	): Promise<JobApplication[]> {
 		let rows = await db
 			.select()
@@ -42,6 +47,12 @@ export const jobApplicationRepository = {
 			.orderBy(desc(jobApplications.createdAt));
 		if (opts?.status) {
 			rows = rows.filter((r) => r.status === opts.status);
+		}
+		if (opts?.fromDate) {
+			rows = rows.filter((r) => r.createdAt && r.createdAt >= opts.fromDate!);
+		}
+		if (opts?.toDate) {
+			rows = rows.filter((r) => r.createdAt && r.createdAt <= opts.toDate!);
 		}
 		const result = rows.map(rowToJobApplication);
 		if (opts?.limit !== undefined) {
