@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "build": "npm run build -w @autoapply/shared && npm run build -w @autoapply/backend && npm run build -w @autoapply/extension"
+    "build": "npm run build -w @autoapply/shared && npm run build -w @autoapply/backend && npm run build -w @autoapply/extension",
+    "start": "npm run start -w @autoapply/backend"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
