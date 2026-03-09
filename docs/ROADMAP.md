@@ -21,7 +21,7 @@ Detailed step-by-step roadmap for the AutoApply MVP (LinkedIn Jobs). Serves as b
 | 1 | Repository & toolchain foundations | ✅ Done |
 | 2 | Domain & data models (backend, DB, shared) | ✅ Done |
 | 3 | Compatibility algorithm & scoring API | ✅ Done |
-| 4 | Application backend (job processing, AI, audit) | ⏳ Not started |
+| 4 | Application backend (job processing, AI, audit) | ✅ Done |
 | 5 | Chromium extension (MV3) — skeleton, messaging, LinkedIn scraping | ⏳ Not started |
 | 6 | Autofill, automation & anti-detection mitigations | ⏳ Not started |
 | 7 | Testing, observability & hardening | ⏳ Not started |
@@ -141,7 +141,7 @@ Detailed step-by-step roadmap for the AutoApply MVP (LinkedIn Jobs). Serves as b
 
 ---
 
-## Phase 4 — Application Backend (Job Processing, AI, Audit)
+## Phase 4 — Application Backend (Job Processing, AI, Audit) ✅ Done
 
 ### Objectives
 
