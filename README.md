@@ -12,6 +12,13 @@ Browser extension that automates job applications (MVP: LinkedIn Jobs). Discover
 | `docs/` | PRD, ADRs |
 | `.cursor/rules/` | Product, stack, architecture, workflow, testing |
 
+## Tooling & workflows
+
+- **Package manager**: npm workspaces (root `package.json` with `backend`, `extension`, `shared`).
+- **TypeScript**: `tsconfig.base.json` at the root, extended by each workspace.
+- **Lint/format**: ESLint (`npm run lint`) and Prettier (`npm run format` / `npm run format:fix`).
+- **Tests**: Vitest (`npm test`) runs tests across all workspaces. New or changed behaviour must be covered by tests created or updated in the same branch/PR.
+
 ## References
 
 - **Product scope & data model**: `.cursor/rules/product.mdc`

@@ -7,11 +7,12 @@ alwaysApply: true
 
 After implementing any change:
 
-1. Run the project test suite.
-2. If a test fails:
+1. Create or update automated tests that cover the new or changed behaviour in the same branch/PR (tests and implementation evolve together).
+2. Run the project test suite.
+3. If a test fails:
    - Do NOT modify the test.
    - Fix the implementation.
-3. Only after all tests pass:
+4. Only after all tests pass:
    - Create modular commits (one logical change per commit; split large changes into multiple commits).
    - Use conventional commit messages (feat:, fix:, refactor:, etc.).
    - Use branches professionally (feature branches, fix branches; integrate via merge/rebase as defined for the project).

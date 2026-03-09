@@ -1,0 +1,29 @@
+{
+  "name": "autoapply",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "extension",
+    "shared"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run build --workspaces"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-node": "^11.1.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.6.0",
+    "vitest": "^1.6.0"
+  }
+}
