@@ -42,6 +42,9 @@ data/
 # Test / coverage
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # Extension packaging (optional)
 *.crx
