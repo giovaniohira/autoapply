@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { jobApplicationRepository } from "../db/jobApplicationRepository.js";
+import { logger } from "../logger.js";
 
 /**
  * POST /applications/:id/missing-fields
@@ -27,8 +28,7 @@ export async function postMissingFields(req: Request, res: Response): Promise<vo
 		return;
 	}
 	const reason = `Missing fields: ${missingFields.join(", ")}`;
-	// eslint-disable-next-line no-console
-	console.warn("[AutoApply] Application incomplete:", { id, missingFields });
+	logger.warn("Application incomplete", { applicationId: id, missingFields });
 	await jobApplicationRepository.update(id, {
 		status: "INCOMPLETE",
 		failureReason: reason,

@@ -6,6 +6,7 @@ import { jobApplicationRepository } from "../db/jobApplicationRepository.js";
 import { applicationAnswerRepository } from "../db/applicationAnswerRepository.js";
 import { computeCompatibility } from "../scoring/compatibilityService.js";
 import { generateAnswer } from "../ai/aiClient.js";
+import { logger } from "../logger.js";
 
 export interface ApplyJobInput {
 	userId: string;
@@ -119,8 +120,11 @@ export async function applyJob(input: ApplyJobInput): Promise<ApplyJobResult> {
 			answers.push({ question, answer: answerText });
 		} catch (err) {
 			// Log but do not fail the whole apply; answer can be filled manually
-			// eslint-disable-next-line no-console
-			console.error("AI answer generation failed for question:", question, err);
+			logger.error("AI answer generation failed", {
+				question,
+				jobApplicationId,
+				error: err instanceof Error ? err.message : String(err),
+			});
 		}
 	}
 

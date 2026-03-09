@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { applyJob } from "../jobs/applyJobService.js";
 import { applyJobBodySchema } from "./schemas/apply.js";
+import { logger } from "../logger.js";
 
 export async function postApply(req: Request, res: Response): Promise<void> {
 	const parsed = applyJobBodySchema.safeParse(req.body);
@@ -25,6 +26,10 @@ export async function postApply(req: Request, res: Response): Promise<void> {
 			res.status(404).json({ error: message });
 			return;
 		}
+		logger.error("Apply job failed", {
+			error: message,
+			stack: err instanceof Error ? err.stack : undefined,
+		});
 		res.status(500).json({ error: message });
 	}
 }
