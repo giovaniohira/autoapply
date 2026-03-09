@@ -17,13 +17,19 @@ Browser extension that automates job applications (MVP: LinkedIn Jobs). Discover
 - **Package manager**: npm workspaces (root `package.json` with `backend`, `extension`, `shared`).
 - **TypeScript**: `tsconfig.base.json` at the root, extended by each workspace.
 - **Lint/format**: ESLint (`npm run lint`) and Prettier (`npm run format` / `npm run format:fix`).
-- **Tests**: Vitest (`npm test`) runs tests across all workspaces. New or changed behaviour must be covered by tests created or updated in the same branch/PR.
+- **Tests**: Vitest (`npm test`) runs unit and integration tests. Playwright (`npm run test:e2e`) runs E2E tests against the dummy job page fixture.
 
 ## References
 
 - **Product scope & data model**: `.cursor/rules/product.mdc`
 - **Tech stack**: `.cursor/rules/stack.mdc`
 - **Architecture & folder layout**: `.cursor/rules/architecture.mdc`
+
+## Security & configuration
+
+- **API keys**: Stored only in the backend via environment variables (e.g. `OPENAI_API_KEY`). Never commit secrets; `.env` is gitignored.
+- **No secrets in code**: Credentials and API keys are read from `process.env` (backend) or `chrome.storage` (extension); none are hardcoded.
+- **Extension ↔ backend**: Use HTTPS for the backend URL in production so traffic (profile data, job payloads, answers) is encrypted.
 
 ## MVP
 
