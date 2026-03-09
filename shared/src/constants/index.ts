@@ -1,0 +1,4 @@
+export {
+	COMPATIBILITY_WEIGHTS,
+	DEFAULT_COMPATIBILITY_THRESHOLD,
+} from "./compatibility";
