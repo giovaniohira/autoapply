@@ -13,7 +13,7 @@
     "format:fix": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "npm run build --workspaces"
+    "build": "npm run build -w @autoapply/shared && npm run build -w @autoapply/backend && npm run build -w @autoapply/extension"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.0.0",

@@ -8,5 +8,8 @@ export default defineConfig({
       'shared/src/**/*.test.{ts,tsx}',
     ],
     environment: 'node',
+    env: {
+      DATABASE_PATH: ':memory:',
+    },
   },
 });
