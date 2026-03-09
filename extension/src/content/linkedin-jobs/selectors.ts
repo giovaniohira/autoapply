@@ -169,3 +169,120 @@ export function isJobViewPage(url?: string): boolean {
 	const href = url ?? (typeof window !== "undefined" ? window.location.href : "");
 	return /^https:\/\/www\.linkedin\.com\/jobs\/view\//.test(href);
 }
+
+// --- Easy Apply application form (modal) ---
+
+/** Selectors for the Easy Apply modal and form fields */
+const EASY_APPLY_SELECTORS = {
+	/** Modal/dialog container */
+	modal:
+		".jobs-easy-apply-content-section, .artdeco-modal, [role='dialog'].jobs-dialog, [data-test-modal]",
+	/** Form container inside modal */
+	form: "form.jobs-easy-apply-form, .jobs-easy-apply-form__form, .artdeco-modal__content form",
+	/** Generic text inputs (name, email, phone, etc.) — often in fb-form-group or similar */
+	textInputs: "input[type='text'], input[type='email'], input:not([type])",
+	/** Email field (by type or name) */
+	emailInput: "input[type='email'], input[name*='email'], input[id*='email']",
+	/** Phone field */
+	phoneInput: "input[type='tel'], input[name*='phone'], input[id*='phone']",
+	/** Text areas for open-ended questions */
+	textAreas: "textarea",
+	/** Dropdowns (native select or LinkedIn custom dropdown trigger) */
+	selects: "select",
+	/** Custom dropdown trigger (LinkedIn often uses div with role='combobox') */
+	dropdownTrigger: "[role='combobox'], .fb-dropdown__trigger",
+	/** Radio groups */
+	radioGroups: "fieldset[data-test-form-element], .fb-form-group",
+	/** Submit button */
+	submitButton:
+		"button[aria-label='Submit application'], button[aria-label='Review'], button.fb-submit-inline, button[type='submit']",
+	/** Next / Continue (multi-step) */
+	nextButton: "button[aria-label='Continue to next step'], button[data-test-dialog-continue]",
+} as const;
+
+/**
+ * Get the Easy Apply modal element if visible.
+ */
+export function getEasyApplyModal(): Element | null {
+	return document.querySelector(EASY_APPLY_SELECTORS.modal);
+}
+
+/**
+ * Get the form element inside the Easy Apply modal.
+ */
+export function getEasyApplyForm(): Element | null {
+	const modal = getEasyApplyModal();
+	if (!modal) return null;
+	const form = modal.querySelector(EASY_APPLY_SELECTORS.form);
+	return form ?? modal;
+}
+
+/**
+ * Get all focusable form fields in logical order (inputs, textareas, selects).
+ */
+export function getEasyApplyFormFields(): {
+	inputs: HTMLInputElement[];
+	textAreas: HTMLTextAreaElement[];
+	selects: HTMLSelectElement[];
+} {
+	const container = getEasyApplyForm();
+	if (!container) return { inputs: [], textAreas: [], selects: [] };
+
+	const inputs = Array.from(
+		container.querySelectorAll<HTMLInputElement>(EASY_APPLY_SELECTORS.textInputs),
+	).filter((el) => el.offsetParent != null && !el.hidden);
+	const textAreas = Array.from(
+		container.querySelectorAll<HTMLTextAreaElement>(EASY_APPLY_SELECTORS.textAreas),
+	).filter((el) => el.offsetParent != null && !el.hidden);
+	const selects = Array.from(
+		container.querySelectorAll<HTMLSelectElement>(EASY_APPLY_SELECTORS.selects),
+	).filter((el) => el.offsetParent != null && !el.hidden);
+
+	return { inputs, textAreas, selects };
+}
+
+/**
+ * Find an input by placeholder, name, id, or label text (case-insensitive).
+ */
+export function findFormInputByLabel(
+	container: Element,
+	labels: string[],
+): HTMLInputElement | null {
+	const lower = (s: string) => s.toLowerCase();
+	const normalized = labels.map((l) => lower(l.trim()));
+
+	for (const input of container.querySelectorAll<HTMLInputElement>("input")) {
+		if (input.hidden || input.offsetParent == null) continue;
+		const placeholder = lower((input.placeholder ?? "").trim());
+		const name = lower((input.name ?? "").trim());
+		const id = lower((input.id ?? "").trim());
+		const ariaLabel = lower((input.getAttribute("aria-label") ?? "").trim());
+		const combined = [placeholder, name, id, ariaLabel].filter(Boolean);
+		if (normalized.some((n) => combined.some((c) => c.includes(n) || n.includes(c))))
+			return input;
+	}
+	// Label association: <label for="id"> or wrapping label
+	for (const labelEl of container.querySelectorAll("label")) {
+		const text = lower((labelEl.textContent ?? "").trim());
+		if (normalized.some((n) => text.includes(n))) {
+			const forId = labelEl.getAttribute("for");
+			if (forId) {
+				const input = container.querySelector<HTMLInputElement>(`#${CSS.escape(forId)}`);
+				if (input) return input;
+			}
+			const input = labelEl.querySelector("input");
+			if (input) return input;
+		}
+	}
+	return null;
+}
+
+/**
+ * Get submit button in the Easy Apply modal.
+ */
+export function getEasyApplySubmitButton(): HTMLButtonElement | null {
+	const modal = getEasyApplyModal();
+	if (!modal) return null;
+	const btn = modal.querySelector<HTMLButtonElement>(EASY_APPLY_SELECTORS.submitButton);
+	return btn ?? null;
+}

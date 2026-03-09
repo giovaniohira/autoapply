@@ -1,13 +1,15 @@
 /**
  * LinkedIn Jobs content script entry.
- * Runs on both listing and job view pages; dispatches to listing or job-page logic
- * and sends messages to the background script.
+ * Runs on both listing and job view pages; dispatches to listing or job-page logic,
+ * detects Easy Apply modal and triggers autofill flow.
  */
 
-import { isJobViewPage, isListingPage, getJobCards } from "./selectors.js";
+import { isJobViewPage, isListingPage, getJobCards, getEasyApplyModal } from "./selectors.js";
 import { scrapeJobViewPage } from "./scrapeJobPage.js";
 import { scrapeJobCard } from "./scrapeListing.js";
-import type { ContentToBackgroundMessage } from "../../types/messages.js";
+import { getFormQuestions, runAutofill } from "./autofill.js";
+import type { ContentToBackgroundMessage, MessageAutofillData } from "../../types/messages.js";
+import type { JobPayload } from "../../types/api.js";
 
 function sendToBackground(message: ContentToBackgroundMessage): void {
 	chrome.runtime.sendMessage(message).catch(() => {
@@ -49,22 +51,68 @@ function runOnJobViewPage(): void {
 }
 
 /**
- * Notify background that the application form is open (for future autofill).
+ * Request autofill data from background (profile + AI answers) and run autofill when form is open.
  */
-export function notifyApplicationFormOpen(jobLink: string): void {
+function requestAutofillData(job: JobPayload, questions: string[]): void {
 	sendToBackground({
 		type: "AUTOAPPLY_APPLICATION_FORM_OPEN",
-		jobLink,
+		jobLink: job.jobLink,
+		job,
+		questions,
+	});
+}
+
+/** Whether we already requested autofill for the current modal (avoid duplicate requests). */
+let autofillRequestedForCurrentModal = false;
+
+function onAutofillDataReceived(message: MessageAutofillData): void {
+	autofillRequestedForCurrentModal = false;
+	if (message.error) return;
+	runAutofill(message.profile ?? null, message.answers ?? []).then((result) => {
+		if (result.missing.length > 0) {
+			console.warn("[AutoApply] Missing fields (not filled):", result.missing);
+			if (message.jobApplicationId) {
+				sendToBackground({
+					type: "AUTOAPPLY_REPORT_MISSING_FIELDS",
+					jobApplicationId: message.jobApplicationId,
+					missingFields: result.missing,
+				});
+			}
+		}
 	});
 }
 
 function main(): void {
 	if (isJobViewPage()) {
-		// Small delay so DOM is ready
 		setTimeout(runOnJobViewPage, 500);
+		// Watch for Easy Apply modal: trigger autofill when it appears; reset flag when it closes
+		const observer = new MutationObserver(() => {
+			const modal = getEasyApplyModal();
+			if (!modal) {
+				autofillRequestedForCurrentModal = false;
+				return;
+			}
+			if (autofillRequestedForCurrentModal) return;
+			const job = scrapeJobViewPage();
+			if (!job) return;
+			setTimeout(() => {
+				const questions = getFormQuestions();
+				autofillRequestedForCurrentModal = true;
+				requestAutofillData(job, questions);
+			}, 300);
+		});
+		observer.observe(document.body, { childList: true, subtree: true });
 	} else if (isListingPage()) {
 		setTimeout(runOnListingPage, 1000);
 	}
+
+	chrome.runtime.onMessage.addListener(
+		(message: unknown): void => {
+			if (message && typeof message === "object" && "type" in message && message.type === "AUTOAPPLY_AUTOFILL_DATA") {
+				onAutofillDataReceived(message as MessageAutofillData);
+			}
+		},
+	);
 }
 
 main();
