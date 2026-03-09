@@ -2,3 +2,9 @@ header { margin-bottom: 0.5rem; }
 h1 { font-size: 1rem; margin: 0; }
 main { font-size: 0.8rem; min-width: 280px; padding: 0.25rem; }
 #config-status { color: #666; margin-top: 0.25rem; }
+#controls { margin: 0.5rem 0; }
+#controls .row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem; }
+#controls label { flex: 1; }
+#controls input[type="number"] { width: 3.5rem; }
+.muted { color: #666; margin-top: 0.25rem; }
+#recent-count { font-size: 0.75rem; }

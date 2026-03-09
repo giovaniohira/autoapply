@@ -15,8 +15,19 @@
 				<p>Compatibility scoring is active on LinkedIn Jobs.</p>
 				<p id="config-status">Loading…</p>
 			</section>
+			<section id="controls">
+				<div class="row">
+					<label for="automation-toggle">Autofill automation</label>
+					<input type="checkbox" id="automation-toggle" checked />
+				</div>
+				<div class="row">
+					<label for="threshold-input">Score threshold (0–100)</label>
+					<input type="number" id="threshold-input" min="0" max="100" value="60" />
+				</div>
+				<p id="recent-count" class="muted">Applications in last hour: —</p>
+			</section>
 			<section id="actions">
-				<p>Set your backend URL and User ID in extension storage (e.g. via options page).</p>
+				<p class="muted">Set backend URL and User ID in extension storage (e.g. options).</p>
 			</section>
 		</main>
 		<script type="module" src="popup.js"></script>

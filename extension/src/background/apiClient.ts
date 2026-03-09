@@ -2,7 +2,12 @@
  * HTTP client for extension → backend API.
  */
 
-import type { ScoreJobRequest, ScoreJobResponse } from "../types/api.js";
+import type {
+	ApplyJobResponse,
+	AutofillProfile,
+	ScoreJobRequest,
+	ScoreJobResponse,
+} from "../types/api.js";
 import { STORAGE_KEYS, DEFAULTS } from "./storage.js";
 
 async function getBackendUrl(): Promise<string> {
@@ -66,5 +71,112 @@ export async function scoreJob(
 	} catch (e) {
 		const message = e instanceof Error ? e.message : String(e);
 		return { error: `Request failed: ${message}` };
+	}
+}
+
+/**
+ * GET /users/:id — fetch user profile for autofill.
+ */
+export async function getProfile(
+	userId: string,
+): Promise<{ data: AutofillProfile } | { error: string }> {
+	const baseUrl = await getBackendUrl();
+	const url = `${baseUrl.replace(/\/$/, "")}/users/${encodeURIComponent(userId)}`;
+	const headers: Record<string, string> = {};
+	const token = await getToken();
+	if (token) headers["Authorization"] = `Bearer ${token}`;
+
+	try {
+		const res = await fetch(url, { headers });
+		const data = (await res.json()) as
+			| (AutofillProfile & { skills?: unknown })
+			| { error?: string };
+		if (!res.ok) {
+			const msg =
+				typeof (data as { error?: string }).error === "string"
+					? (data as { error: string }).error
+					: `HTTP ${res.status}`;
+			return { error: msg };
+		}
+		const profile: AutofillProfile = {
+			name: (data as AutofillProfile).name,
+			email: (data as AutofillProfile).email,
+			phone: (data as AutofillProfile).phone ?? null,
+			location: (data as AutofillProfile).location ?? null,
+			yearsExperience: (data as AutofillProfile).yearsExperience,
+		};
+		return { data: profile };
+	} catch (e) {
+		const message = e instanceof Error ? e.message : String(e);
+		return { error: `Request failed: ${message}` };
+	}
+}
+
+/**
+ * POST /apply — run apply-job orchestration (score, AI answers); returns profile data for autofill.
+ */
+export async function applyJob(
+	userId: string,
+	job: ScoreJobRequest["job"],
+	options: { threshold?: number; questions?: string[] } = {},
+): Promise<{ data: ApplyJobResponse } | { error: string }> {
+	const baseUrl = await getBackendUrl();
+	const url = `${baseUrl.replace(/\/$/, "")}/apply`;
+	const body = {
+		userId,
+		job,
+		threshold: options.threshold ?? DEFAULTS.DEFAULT_THRESHOLD,
+		questions: options.questions ?? [],
+	};
+	const headers: Record<string, string> = {
+		"Content-Type": "application/json",
+	};
+	const token = await getToken();
+	if (token) headers["Authorization"] = `Bearer ${token}`;
+
+	try {
+		const res = await fetch(url, {
+			method: "POST",
+			headers,
+			body: JSON.stringify(body),
+		});
+		const data = (await res.json()) as ApplyJobResponse | { error?: string };
+		if (!res.ok) {
+			const msg =
+				typeof (data as { error?: string }).error === "string"
+					? (data as { error: string }).error
+					: `HTTP ${res.status}`;
+			return { error: msg };
+		}
+		return { data: data as ApplyJobResponse };
+	} catch (e) {
+		const message = e instanceof Error ? e.message : String(e);
+		return { error: `Request failed: ${message}` };
+	}
+}
+
+/**
+ * POST /applications/:id/missing-fields — log missing required fields for an application.
+ */
+export async function reportMissingFields(
+	jobApplicationId: string,
+	missingFields: string[],
+): Promise<void> {
+	if (missingFields.length === 0) return;
+	const baseUrl = await getBackendUrl();
+	const url = `${baseUrl.replace(/\/$/, "")}/applications/${encodeURIComponent(jobApplicationId)}/missing-fields`;
+	const headers: Record<string, string> = {
+		"Content-Type": "application/json",
+	};
+	const token = await getToken();
+	if (token) headers["Authorization"] = `Bearer ${token}`;
+	try {
+		await fetch(url, {
+			method: "POST",
+			headers,
+			body: JSON.stringify({ missingFields }),
+		});
+	} catch {
+		// Best-effort logging; ignore errors
 	}
 }

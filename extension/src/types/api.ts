@@ -49,3 +49,20 @@ export interface ScoreJobResponse {
 	};
 	jobApplicationId?: string;
 }
+
+/** User profile for autofill (from GET /users/:id). */
+export interface AutofillProfile {
+	name: string;
+	email: string;
+	phone: string | null;
+	location: string | null;
+	yearsExperience: number;
+}
+
+/** Response from POST /apply (backend apply-job orchestration). */
+export interface ApplyJobResponse {
+	jobApplicationId: string;
+	score: number;
+	status: "READY_FOR_EXTENSION" | "SKIPPED_LOW_SCORE";
+	answers?: Array<{ question: string; answer: string }>;
+}
