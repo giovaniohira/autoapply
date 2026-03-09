@@ -1,0 +1,63 @@
+---
+description: Convenções de arquitetura do projeto
+alwaysApply: false
+---
+
+# Architecture
+
+## Visão geral
+
+- **Extension**: content scripts (LinkedIn), background (service worker), popup; não contém lógica de score nem persistência pesada — delega ao backend.
+- **Backend**: API REST; cálculo de compatibilidade; persistência; orquestração de chamadas ao AI service.
+- **AI Service**: stateless; recebe contexto e pergunta, devolve texto. Pode ser módulo dentro do backend ou serviço separado.
+- **Database**: única fonte de verdade para User, UserSkills, JobApplication, ApplicationAnswer.
+
+## Boundaries
+
+- Extension e Backend comunicam via HTTP/HTTPS; autenticação do usuário (e.g. token) obrigatória.
+- Extension não calcula score sozinha em produção — envia vaga + user id (ou perfil necessário) ao backend; backend retorna score e pode acionar fluxo de aplicação.
+- Dados sensíveis (currículo, respostas) trafegam apenas em canal seguro e ficam no backend/DB.
+
+## DOM e scraping (LinkedIn)
+
+- **DOM abstraction layer**: todo acesso a elementos da página (seletores) deve passar por uma camada de abstração (ex.: `linkedin/selectors.ts` ou módulo por página).
+- **Seletores**: centralizados; evitar strings espalhadas; facilitar ajustes quando o LinkedIn mudar o DOM.
+- **Resiliência**: fallbacks e retry com backoff quando elementos não forem encontrados.
+
+## Estrutura de pastas (raiz do projeto)
+
+```
+autoapply/
+├── extension/           # Browser extension (MV3)
+│   ├── src/
+│   │   ├── background/  # Service worker
+│   │   ├── content/     # Content scripts (LinkedIn Jobs)
+│   │   ├── popup/       # UI popup
+│   │   └── shared/      # Types, constants (ou link a shared)
+│   ├── public/
+│   └── manifest.json
+├── backend/             # API + scoring + persistence
+│   ├── src/
+│   │   ├── api/         # Routes, handlers
+│   │   ├── scoring/     # Compatibility algorithm
+│   │   ├── jobs/        # Job processing
+│   │   ├── ai/          # AI answer generation (ou client)
+│   │   └── db/          # Schema, migrations, repos
+│   └── ...
+├── shared/              # Tipos e constantes compartilhados (opcional)
+│   └── src/
+│       ├── types/
+│       └── constants/
+└── docs/                # PRD, ADRs (opcional)
+```
+
+## Naming e camadas
+
+- **Extension**: `content/` por contexto (e.g. `linkedin-jobs`); `background/` para orchestration e messaging.
+- **Backend**: camada de rotas → handlers → services → db; scoring e AI como serviços injetáveis.
+- **Shared**: apenas tipos e constantes sem dependências de runtime do Node ou do browser.
+
+## Automação e segurança
+
+- Delays randômicos e limites de taxa na extensão para reduzir detecção.
+- Credenciais e API keys apenas no backend ou em storage seguro da extensão (e.g. chrome.storage); nunca em código versionado.

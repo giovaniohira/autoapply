@@ -1,0 +1,65 @@
+---
+description: AutoApply PRD — escopo do produto, modelos de dados, algoritmo de compatibilidade
+alwaysApply: false
+---
+
+# Product (AutoApply PRD)
+
+## Objetivo
+
+Extensão de navegador que automatiza candidatura a vagas (MVP: LinkedIn Jobs). Maximizar candidaturas qualificadas com mínimo esforço humano.
+
+## Pipeline principal
+
+1. Descoberta de vagas (LinkedIn Jobs, filtros do usuário)
+2. Cálculo de compatibilidade (score 0–100)
+3. Aplicação automática se score ≥ threshold (default 60)
+4. Autofill + respostas IA para perguntas abertas
+5. Envio e registro para auditoria/análise
+
+## Algoritmo de compatibilidade (pesos)
+
+| Critério              | Peso | Regras |
+|-----------------------|------|--------|
+| Experience Match      | 40%  | Rejeitar se `required_years - user_years >= 2`; senão score proporcional |
+| Technology Match      | 30%  | Intersecção job_technologies × user_technologies |
+| Role Match            | 15%  | Similaridade de cargos (Backend/Full Stack/Software Engineer, etc.) |
+| Location Match        | 10%  | remote, country, city |
+| Additional Requirements | 5% | idioma, work authorization, certificações |
+
+## Autofill (campos)
+
+full name, email, phone, location, LinkedIn, GitHub, portfolio, years of experience, work authorization, salary expectation. Fonte: perfil estruturado, currículo, documentos, respostas anteriores.
+
+## Dados ausentes
+
+Se campo obrigatório não preenchível: registrar campo, alerta no dashboard, solicitar ao usuário. Candidatura pode ser interrompida ou marcada incompleta.
+
+## Modelos de dados (core)
+
+- **User**: id, name, email, phone, location, years_experience
+- **UserSkills**: user_id, skill, years_experience
+- **JobApplication**: id, user_id, company, role, job_link, compatibility_score, applied_at, status
+- **ApplicationAnswer**: id, job_application_id, question, answer
+
+## Componentes do sistema
+
+- **Browser Extension**: navegação, scraping, automação de formulários
+- **Backend API**: score, processamento de vagas, persistência
+- **AI Service**: geração de respostas, interpretação de perguntas
+- **Database**: perfil, histórico de vagas, aplicações, respostas
+
+## Riscos (mitigações)
+
+- **LinkedIn muda DOM**: camada de abstração de DOM, seletores resilientes
+- **Detecção de automação**: delays randômicos, limite de candidaturas, comportamento humano
+- **Qualidade das respostas IA**: histórico de respostas, edição manual no dashboard
+
+## Plataformas MVP
+
+- Browser: Chromium (prioridade Vivaldi)
+- Job board: LinkedIn Jobs
+
+## Filtros do usuário
+
+Location (remote, países, cidades), Role, Technologies, Experience Range (mín/máx).

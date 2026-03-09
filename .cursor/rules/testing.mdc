@@ -1,0 +1,11 @@
+---
+description: Regras de testes — suite obrigatória, não alterar testes
+globs: **/*.test.* **/*.spec.* **/test/** **/tests/** jest.config.* vitest.config.*
+alwaysApply: false
+---
+
+# Testing
+
+- Run the full test suite after every implementation change.
+- If a test fails: do NOT change the test. Fix the implementation.
+- Never skip or disable a failing test to make the pipeline green.

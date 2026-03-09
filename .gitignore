@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+out/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and temp
+*.log
+npm-debug.log*
+tmp/
+temp/
+.cache/
+
+# Database (local dev)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Extension packaging (optional)
+*.crx
+*.zip
+*.xpi
