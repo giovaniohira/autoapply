@@ -8,6 +8,7 @@ import type {
 	ContentToBackgroundMessage,
 	MessageScoreResult,
 } from "../types/messages.js";
+import { logger } from "../logger.js";
 import { applyJob, getProfile, reportMissingFields, scoreJob } from "./apiClient.js";
 import { DEFAULTS, STORAGE_KEYS } from "./storage.js";
 
@@ -21,11 +22,13 @@ chrome.runtime.onMessage.addListener(
 			handleJobFound(message.payload, sender.tab?.id ?? null)
 				.then(sendResponse)
 				.catch((err) => {
+					const errorMsg = err instanceof Error ? err.message : String(err);
+					logger.warn("Job score failed", { error: errorMsg, jobLink: message.payload?.jobLink });
 					sendResponse({
 						type: "AUTOAPPLY_SCORE_RESULT",
 						score: 0,
 						aboveThreshold: false,
-						error: err instanceof Error ? err.message : String(err),
+						error: errorMsg,
 					});
 				});
 			return true;
@@ -34,12 +37,14 @@ chrome.runtime.onMessage.addListener(
 			handleApplicationFormOpen(message, sender.tab?.id ?? null)
 				.then(sendResponse)
 				.catch((err) => {
+					const errorMsg = err instanceof Error ? err.message : String(err);
+					logger.warn("Application form / autofill failed", { error: errorMsg, jobLink: message.jobLink });
 					sendResponse({
 						type: "AUTOAPPLY_AUTOFILL_DATA",
 						profile: null,
 						answers: [],
 						jobApplicationId: null,
-						error: err instanceof Error ? err.message : String(err),
+						error: errorMsg,
 					});
 				});
 			return true;

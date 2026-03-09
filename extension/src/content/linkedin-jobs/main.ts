@@ -8,6 +8,7 @@ import { isJobViewPage, isListingPage, getJobCards, getEasyApplyModal } from "./
 import { scrapeJobViewPage } from "./scrapeJobPage.js";
 import { scrapeJobCard } from "./scrapeListing.js";
 import { getFormQuestions, runAutofill } from "./autofill.js";
+import { logger } from "../../logger.js";
 import type { ContentToBackgroundMessage, MessageAutofillData } from "../../types/messages.js";
 import type { JobPayload } from "../../types/api.js";
 
@@ -70,7 +71,7 @@ function onAutofillDataReceived(message: MessageAutofillData): void {
 	if (message.error) return;
 	runAutofill(message.profile ?? null, message.answers ?? []).then((result) => {
 		if (result.missing.length > 0) {
-			console.warn("[AutoApply] Missing fields (not filled):", result.missing);
+			logger.warn("Missing fields (not filled)", { missing: result.missing });
 			if (message.jobApplicationId) {
 				sendToBackground({
 					type: "AUTOAPPLY_REPORT_MISSING_FIELDS",
