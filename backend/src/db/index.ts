@@ -3,3 +3,4 @@ export * from "./schema.js";
 export * from "./userRepository.js";
 export * from "./jobApplicationRepository.js";
 export * from "./applicationAnswerRepository.js";
+export * from "./jobFiltersRepository.js";

@@ -8,6 +8,13 @@
       "when": 1773087877951,
       "tag": "0000_flimsy_daimon_hellstrom",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1741550400000,
+      "tag": "0001_job_filters",
+      "breakpoints": true
     }
   ]
 }

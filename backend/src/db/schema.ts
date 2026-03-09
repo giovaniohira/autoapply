@@ -53,3 +53,16 @@ export const applicationAnswers = sqliteTable("application_answers", {
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
+
+export const jobFilters = sqliteTable("job_filters", {
+	userId: text("user_id")
+		.primaryKey()
+		.references(() => users.id, { onDelete: "cascade" }),
+	role: text("role"),
+	technologiesJson: text("technologies_json"),
+	locationJson: text("location_json"),
+	minExperience: integer("min_experience"),
+	maxExperience: integer("max_experience"),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});
