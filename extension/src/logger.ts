@@ -19,20 +19,15 @@ function formatEntry(level: LogLevel, msg: string, fields?: Record<string, unkno
 
 export const logger = {
 	info(msg: string, fields?: Record<string, unknown>): void {
-		// eslint-disable-next-line no-console
 		console.log(formatEntry("info", msg, fields));
 	},
 	warn(msg: string, fields?: Record<string, unknown>): void {
-		// eslint-disable-next-line no-console
 		console.warn(formatEntry("warn", msg, fields));
 	},
 	error(msg: string, fields?: Record<string, unknown>): void {
-		// eslint-disable-next-line no-console
 		console.error(formatEntry("error", msg, fields));
 	},
 	debug(msg: string, fields?: Record<string, unknown>): void {
-		// Only in development or when explicitly enabled via storage
-		// eslint-disable-next-line no-console
 		console.debug(formatEntry("debug", msg, fields));
 	},
 };

@@ -1,7 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
 import { runMigrations } from "../../db/migrate.js";
-import { userRepository } from "../../db/userRepository.js";
 import { createApp } from "../../app.js";
 
 beforeAll(() => {

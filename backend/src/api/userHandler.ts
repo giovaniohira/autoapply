@@ -47,7 +47,7 @@ export async function postUser(req: Request, res: Response): Promise<void> {
 			yearsExperience: data.yearsExperience,
 		});
 		res.status(201).json(user);
-	} catch (err) {
+	} catch {
 		// Duplicate id
 		res.status(409).json({
 			error: "User already exists",
