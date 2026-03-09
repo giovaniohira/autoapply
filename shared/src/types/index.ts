@@ -11,3 +11,4 @@ export type {
 	LocationPreference,
 	JobPayload,
 } from "./compatibility.js";
+export type { JobFilters } from "./jobFilters.js";
