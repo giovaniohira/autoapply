@@ -1,9 +1,14 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { runMigrations } from "../../db/migrate.js";
 import { userRepository } from "../../db/userRepository.js";
 import { jobApplicationRepository } from "../../db/jobApplicationRepository.js";
+import { applicationAnswerRepository } from "../../db/applicationAnswerRepository.js";
 import { createApp } from "../../app.js";
+
+vi.mock("../../ai/aiClient.js", () => ({
+	generateAnswer: vi.fn().mockResolvedValue("Mocked AI answer for integration test"),
+}));
 
 beforeAll(() => {
 	runMigrations();
@@ -98,5 +103,41 @@ describe("POST /apply", () => {
 			jobLink,
 		);
 		expect(found?.status).toBe("SKIPPED_LOW_SCORE");
+	});
+
+	it("creates ApplicationAnswer rows when score >= threshold and questions provided (mocked AI)", async () => {
+		const app = createApp();
+		const jobLink = "https://linkedin.com/jobs/apply-with-questions";
+		const questions = ["Why do you want to join?", "Describe your experience."];
+		const res = await request(app)
+			.post("/apply")
+			.send({
+				userId: applyUserId,
+				job: {
+					company: "High Score Co",
+					role: "Software Engineer",
+					jobLink,
+					requiredYearsExperience: 3,
+					technologies: ["TypeScript"],
+				},
+				threshold: 60,
+				questions,
+			});
+		expect(res.status).toBe(200);
+		expect(res.body.status).toBe("READY_FOR_EXTENSION");
+		expect(res.body.jobApplicationId).toBeDefined();
+		expect(res.body.answers).toHaveLength(2);
+		expect(res.body.answers?.map((a: { question: string }) => a.question)).toEqual(questions);
+
+		const found = await jobApplicationRepository.findByUserAndJobLink(
+			applyUserId,
+			jobLink,
+		);
+		expect(found).not.toBeNull();
+		const answers = await applicationAnswerRepository.findByJobApplicationId(
+			found!.id,
+		);
+		expect(answers).toHaveLength(2);
+		expect(answers.map((a) => a.answer).every((t) => t === "Mocked AI answer for integration test")).toBe(true);
 	});
 });
