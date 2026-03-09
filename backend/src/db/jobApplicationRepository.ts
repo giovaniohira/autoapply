@@ -1,7 +1,7 @@
 import { eq, and, desc } from "drizzle-orm";
 import type { JobApplication, JobApplicationStatus } from "@autoapply/shared";
-import { db } from "./client";
-import { jobApplications } from "./schema";
+import { db } from "./client.js";
+import { jobApplications } from "./schema.js";
 
 function rowToJobApplication(
 	row: typeof jobApplications.$inferSelect,

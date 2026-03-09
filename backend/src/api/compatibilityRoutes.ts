@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { postScore } from "./compatibilityHandler";
+import { postScore } from "./compatibilityHandler.js";
 
 export const compatibilityRouter = Router();
 

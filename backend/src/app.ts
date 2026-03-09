@@ -1,5 +1,5 @@
 import express from "express";
-import { compatibilityRouter } from "./api/compatibilityRoutes";
+import { compatibilityRouter } from "./api/compatibilityRoutes.js";
 
 export function createApp(): express.Express {
 	const app = express();

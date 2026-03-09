@@ -1,13 +1,13 @@
-export type { User, UserSkill, UserWithSkills } from "./user";
+export type { User, UserSkill, UserWithSkills } from "./user.js";
 export type {
 	JobApplication,
 	JobApplicationStatus,
 	ApplicationAnswer,
-} from "./job";
+} from "./job.js";
 export type {
 	CompatibilityScore,
 	CompatibilityBreakdown,
 	RoleType,
 	LocationPreference,
 	JobPayload,
-} from "./compatibility";
+} from "./compatibility.js";

@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { rawSqlite } from "./client";
+import { rawSqlite } from "./client.js";
 
 const MIGRATIONS_DIR = join(__dirname, "..", "..", "drizzle");
 const STATEMENT_BREAKPOINT = "--> statement-breakpoint";

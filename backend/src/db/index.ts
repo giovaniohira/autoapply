@@ -1,5 +1,5 @@
-export { db } from "./client";
-export * from "./schema";
-export * from "./userRepository";
-export * from "./jobApplicationRepository";
-export * from "./applicationAnswerRepository";
+export { db } from "./client.js";
+export * from "./schema.js";
+export * from "./userRepository.js";
+export * from "./jobApplicationRepository.js";
+export * from "./applicationAnswerRepository.js";

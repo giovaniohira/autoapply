@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { User, UserSkill } from "@autoapply/shared";
-import { db } from "./client";
-import { users, userSkills } from "./schema";
+import { db } from "./client.js";
+import { users, userSkills } from "./schema.js";
 
 function rowToUser(row: typeof users.$inferSelect): User {
 	return {

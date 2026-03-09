@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { ApplicationAnswer } from "@autoapply/shared";
-import { db } from "./client";
-import { applicationAnswers } from "./schema";
+import { db } from "./client.js";
+import { applicationAnswers } from "./schema.js";
 
 function rowToApplicationAnswer(
 	row: typeof applicationAnswers.$inferSelect,

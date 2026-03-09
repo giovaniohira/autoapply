@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
 import type { Request, Response } from "express";
 import { DEFAULT_COMPATIBILITY_THRESHOLD } from "@autoapply/shared";
-import { userRepository } from "../db/userRepository";
-import { jobApplicationRepository } from "../db/jobApplicationRepository";
-import { computeCompatibility } from "../scoring/compatibilityService";
+import { userRepository } from "../db/userRepository.js";
+import { jobApplicationRepository } from "../db/jobApplicationRepository.js";
+import { computeCompatibility } from "../scoring/compatibilityService.js";
 import {
 	scoreJobRequestBodySchema,
 	type ScoreJobResponse,
-} from "./schemas/compatibility";
+} from "./schemas/compatibility.js";
 
 export async function postScore(req: Request, res: Response): Promise<void> {
 	const parsed = scoreJobRequestBodySchema.safeParse(req.body);
